@@ -17,4 +17,4 @@ class Fx:
         yen_file.close()
         doller_file.close()
 
-p=Fx(1000000,0)
+p=Fx(2000000,0)
