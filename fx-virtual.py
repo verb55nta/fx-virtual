@@ -3,9 +3,10 @@
 import datetime
 import sys
 import os.path
+import math
 
 class Fx:
-#--------------------------------------------------------------------
+    #------------------------------
     def __init__(self,yen,doller):
         
         self.__c_place = 1
@@ -45,12 +46,11 @@ class Fx:
         path=rate_path_file.read().rstrip("\n")
         doll_bid_file=open(path+"/doll-bid","r")
         doll_ask_file=open(path+"/doll-ask","r")
-        self.__doll_bid=doll_bid_file.read().rstrip("\n")
-        self.__doll_ask=doll_ask_file.read().rstrip("\n")
+        self.__doll_bid=float(doll_bid_file.read().rstrip("\n"))
+        self.__doll_ask=float(doll_ask_file.read().rstrip("\n"))
         #print(doll_bid)
         #print(doll_ask)
-
-#--------------------------------------------------------------------
+    #------------------------------
     def print_now_yen(self):
         print(self.__yen)
     def print_now_doller(self):
@@ -59,15 +59,17 @@ class Fx:
         print(self.__doll_bid)
     def print_now_doll_ask(self):
         print(self.__doll_ask)
-'''
-    def set_yen(self,yen):
-        #print(yen)
-        self.__yen=yen
-    def set_doller(self,doller):
-        #print(doller)
-        self.__doller=doller
-'''
-
+    #------------------------------
+    def buy_doll(self,doller):
+        self.__yen -= math.ceil(self.__doll_ask * doller)
+        self.__doller += doller
+        #print("dummy")
+        
+    def sell_doll(self,doller):
+        self.__yen += math.floor(self.__doll_bid * doller)
+        self.__doller -= doller
+        #print("dummy")
+        
 #initialize start
 p=Fx(2000000,0)
 p.Read_rate()
@@ -77,3 +79,9 @@ p.print_now_yen()
 p.print_now_doller()
 p.print_now_doll_bid()
 p.print_now_doll_ask()
+p.buy_doll(1000)
+p.print_now_yen()
+p.print_now_doller()
+p.sell_doll(1000)
+p.print_now_yen()
+p.print_now_doller()
