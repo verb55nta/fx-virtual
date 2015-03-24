@@ -2,6 +2,7 @@
 
 import datetime
 import sys
+import os
 import os.path
 import math
 
@@ -44,8 +45,9 @@ class Fx:
     def Read_rate(self):
         rate_path_file=open("./rate_path_doller","r")
         path=rate_path_file.read().rstrip("\n")
-        doll_bid_file=open(path+"/doll-bid","r")
-        doll_ask_file=open(path+"/doll-ask","r")
+        print(path)
+        doll_bid_file=open(path+"doll-bid","r")
+        doll_ask_file=open(path+"doll-ask","r")
         self.__doll_bid=float(doll_bid_file.read().rstrip("\n"))
         self.__doll_ask=float(doll_ask_file.read().rstrip("\n"))
         #print(doll_bid)
