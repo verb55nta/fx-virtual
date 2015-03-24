@@ -16,11 +16,11 @@ class Fx:
         now = datetime.datetime.today()
         yen_file = open('./yen','a+')
         if os.path.getsize("./yen") == 0:
-            yen_file.write("{0},{1}".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen))
+            yen_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen))
         doller_file = open('doller','a+')
         line = doller_file.readlines()
         if os.path.getsize("./doller") == 0:
-            doller_file.write("{0},{1}".format(now.strftime("%Y/%m/%d %H:%M:%S"),doller))
+            doller_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),doller))
 
         yen_file.seek(0)
         line=yen_file.readline()
@@ -69,6 +69,13 @@ class Fx:
         self.__yen += math.floor(self.__doll_bid * doller)
         self.__doller -= doller
         #print("dummy")
+    #------------------------------
+    def save_money_status(self):
+        now = datetime.datetime.today()
+        yen_file = open('./yen','a+')
+        yen_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen))
+        doller_file = open('doller','a+')
+        doller_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__doller))
         
 #initialize start
 p=Fx(2000000,0)
@@ -85,3 +92,4 @@ p.print_now_doller()
 p.sell_doll(1000)
 p.print_now_yen()
 p.print_now_doller()
+p.save_money_status()
