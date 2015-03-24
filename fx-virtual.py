@@ -32,7 +32,7 @@ class Fx:
         doller_file.seek(0)
         line=doller_file.readline()
         while line:
-            self.__doller = int(line.split(',')[self.__c_place])
+            self.__doller = float(line.split(',')[self.__c_place])
             line=doller_file.readline()
         
         #print("yen={0}".format(self.__yen))
@@ -45,7 +45,7 @@ class Fx:
     def Read_rate(self):
         rate_path_file=open("./rate_path_doller","r")
         path=rate_path_file.read().rstrip("\n")
-        print(path)
+        #print(path)
         doll_bid_file=open(path+"doll-bid","r")
         doll_ask_file=open(path+"doll-ask","r")
         self.__doll_bid=float(doll_bid_file.read().rstrip("\n"))
@@ -84,14 +84,29 @@ p=Fx(2000000,0)
 p.Read_rate()
 #initialize end
 
-p.print_now_yen()
-p.print_now_doller()
-p.print_now_doll_bid()
-p.print_now_doll_ask()
-p.buy_doll(1000)
-p.print_now_yen()
-p.print_now_doller()
-p.sell_doll(1000)
-p.print_now_yen()
-p.print_now_doller()
-p.save_money_status()
+#p.save_money_status()
+#print(sys.argv)
+if len(sys.argv) > 1:
+    if sys.argv[1] == "print":
+        if sys.argv[2] == "yen":
+            p.print_now_yen()
+        elif sys.argv[2] == "doll":
+            p.print_now_doller()
+        elif sys.argv[2] == "doll-bid":
+            p.print_now_doll_bid()
+        elif sys.argv[2] == "doll-ask":
+            p.print_now_doll_ask()
+        else:
+            print("dummy")
+    elif sys.argv[1] == "buy":
+        if sys.argv[2] == "doll":
+            p.buy_doll(float(sys.argv[3]))
+            p.save_money_status()
+    elif sys.argv[1] == "sell":
+        if sys.argv[2] == "doll":
+            p.sell_doll(float(sys.argv[3]))
+            p.save_money_status()
+    else:
+        print("Wrong arg")
+else:
+    print("dummy")
