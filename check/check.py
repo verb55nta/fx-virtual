@@ -12,4 +12,15 @@ path=data_path_file.read().rstrip("\n")
 #print(path)
 #print(now.strftime("%Y%m%d"))
 doll_rate_file=open(path+now.strftime("%Y%m%d"))
-print(doll_rate_file.read())
+#print(doll_rate_file.read())
+line=doll_rate_file.readline()
+doll_rate_bid=[]
+doll_rate_ask=[]
+while line:
+    doll_rate_bid.append(float(line.split(':')[2]))
+    doll_rate_ask.append(float(line.split(':')[4]))
+    line=doll_rate_file.readline()
+#print("doll_rate_bid:")
+print(len(doll_rate_bid))
+#print("doll_rate_ask:")
+print(len(doll_rate_ask))
