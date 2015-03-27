@@ -33,11 +33,14 @@ if len(doll_rate_bid) < 60 :
 #---------------------------------------------------------
 
 dollar_file = open('../dollar','r')
-line = dollar_file.readlines()
+line = dollar_file.readline()
 while line:
     my_dollar = float(line.split(',')[1])
     line=dollar_file.readline()
-print(my_dollar)
+#print(my_dollar)
+if my_dollar != 0.0 :
+    print("already buying dollar")
+    sys.exit(1)
 
 #---------------------------------------------------------
 #sell check
