@@ -21,6 +21,22 @@ while line:
     doll_rate_ask.append(float(line.split(':')[4]))
     line=doll_rate_file.readline()
 #print("doll_rate_bid:")
-print(len(doll_rate_bid))
+#print(len(doll_rate_bid))
 #print("doll_rate_ask:")
-print(len(doll_rate_ask))
+#print(len(doll_rate_ask))
+if len(doll_rate_bid) < 60 :
+    print("few data")
+    sys.exit(1)
+#print("Hello World")
+#buy check
+#---------------------------------------------------------
+
+
+
+#---------------------------------------------------------
+#sell check
+#---------------------------------------------------------
+
+
+
+#---------------------------------------------------------
