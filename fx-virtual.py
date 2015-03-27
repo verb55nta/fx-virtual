@@ -8,20 +8,20 @@ import math
 
 class Fx:
     #------------------------------
-    def __init__(self,yen,doller):
+    def __init__(self,yen,dollar):
         
         self.__c_place = 1
         self.__yen = 0
-        self.__doller = 0
+        self.__dollar = 0
         
         now = datetime.datetime.today()
         yen_file = open('./yen','a+')
         if os.path.getsize("./yen") == 0:
             yen_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen))
-        doller_file = open('doller','a+')
-        line = doller_file.readlines()
-        if os.path.getsize("./doller") == 0:
-            doller_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),doller))
+        dollar_file = open('dollar','a+')
+        line = dollar_file.readlines()
+        if os.path.getsize("./dollar") == 0:
+            dollar_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),dollar))
 
         yen_file.seek(0)
         line=yen_file.readline()
@@ -29,21 +29,21 @@ class Fx:
             self.__yen = int(line.split(',')[self.__c_place])
             line=yen_file.readline()
         
-        doller_file.seek(0)
-        line=doller_file.readline()
+        dollar_file.seek(0)
+        line=dollar_file.readline()
         while line:
-            self.__doller = float(line.split(',')[self.__c_place])
-            line=doller_file.readline()
+            self.__dollar = float(line.split(',')[self.__c_place])
+            line=dollar_file.readline()
         
         #print("yen={0}".format(self.__yen))
-        #print("doller={0}".format(self.__doller))
+        #print("dollar={0}".format(self.__dollar))
         
 
         yen_file.close()
-        doller_file.close()
+        dollar_file.close()
 
     def Read_rate(self):
-        rate_path_file=open("./rate_path_doller","r")
+        rate_path_file=open("./rate_path_dollar","r")
         path=rate_path_file.read().rstrip("\n")
         #print(path)
         doll_bid_file=open(path+"doll-bid","r")
@@ -55,29 +55,29 @@ class Fx:
     #------------------------------
     def print_now_yen(self):
         print(self.__yen)
-    def print_now_doller(self):
-        print(self.__doller)
+    def print_now_dollar(self):
+        print(self.__dollar)
     def print_now_doll_bid(self):
         print(self.__doll_bid)
     def print_now_doll_ask(self):
         print(self.__doll_ask)
     #------------------------------
-    def buy_doll(self,doller):
-        self.__yen -= math.ceil(self.__doll_ask * doller)
-        self.__doller += doller
+    def buy_doll(self,dollar):
+        self.__yen -= math.ceil(self.__doll_ask * dollar)
+        self.__dollar += dollar
         #print("dummy")
         
-    def sell_doll(self,doller):
-        self.__yen += math.floor(self.__doll_bid * doller)
-        self.__doller -= doller
+    def sell_doll(self,dollar):
+        self.__yen += math.floor(self.__doll_bid * dollar)
+        self.__dollar -= dollar
         #print("dummy")
     #------------------------------
     def save_money_status(self):
         now = datetime.datetime.today()
         yen_file = open('./yen','a+')
         yen_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen))
-        doller_file = open('doller','a+')
-        doller_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__doller))
+        dollar_file = open('dollar','a+')
+        dollar_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__dollar))
         
 #initialize start
 p=Fx(2000000,0)
@@ -91,7 +91,7 @@ if len(sys.argv) > 1:
         if sys.argv[2] == "yen":
             p.print_now_yen()
         elif sys.argv[2] == "doll":
-            p.print_now_doller()
+            p.print_now_dollar()
         elif sys.argv[2] == "doll-bid":
             p.print_now_doll_bid()
         elif sys.argv[2] == "doll-ask":
