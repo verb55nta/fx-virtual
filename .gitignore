@@ -1,10 +1,11 @@
 *~
 .*~
 rate
-rate_path_doller
-doller
+rate_path_dollar
+dollar
 yen
 #*#
 get-data.sh
 data
-data_path_doller
+*data_path_dollar
+working_path

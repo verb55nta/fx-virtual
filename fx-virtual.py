@@ -12,16 +12,16 @@ class Fx:
         
         self.__c_place = 1
         self.__yen = 0
-        self.__dollar = 0
+        self.__dollar = 0.0
         
         now = datetime.datetime.today()
         yen_file = open('./yen','a+')
         if os.path.getsize("./yen") == 0:
-            yen_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen))
+            yen_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen,"init"))
         dollar_file = open('dollar','a+')
         line = dollar_file.readlines()
         if os.path.getsize("./dollar") == 0:
-            dollar_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),dollar))
+            dollar_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),dollar,"init"))
 
         yen_file.seek(0)
         line=yen_file.readline()
@@ -53,6 +53,10 @@ class Fx:
         #print(doll_bid)
         #print(doll_ask)
     #------------------------------
+    def init_doll_yen(self):
+        self.__yen = 2000000
+        self.__ydollar = 0
+    #------------------------------
     def print_now_yen(self):
         print(self.__yen)
     def print_now_dollar(self):
@@ -72,21 +76,32 @@ class Fx:
         self.__dollar -= dollar
         #print("dummy")
     #------------------------------
-    def save_money_status(self):
+    def save_money_status(self,status):
+        if(status=="buy-doll"):
+            buf = str(status)+"@"+str(self.__doll_ask)
+        elif(status=="sell-doll"):
+            buf = str(status)+"@"+str(self.__doll_bid)
+        else:
+            buf = status
         now = datetime.datetime.today()
         yen_file = open('./yen','a+')
-        yen_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen))
+        yen_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen,buf))
         dollar_file = open('dollar','a+')
-        dollar_file.write("{0},{1}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__dollar))
+        dollar_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__dollar,buf))
         
 #initialize start
-p=Fx(2000000,0)
+p=Fx(2000000,0.0)
 p.Read_rate()
 #initialize end
 
 #p.save_money_status()
 #print(sys.argv)
 if len(sys.argv) > 1:
+    if sys.argv[1] == "reset":
+        p.init_doll_yen()
+        p.save_money_status("reset")
+        print("reset")
+        sys.exit(0)
     if sys.argv[1] == "print":
         if sys.argv[2] == "yen":
             p.print_now_yen()
@@ -101,12 +116,12 @@ if len(sys.argv) > 1:
     elif sys.argv[1] == "buy":
         if sys.argv[2] == "doll":
             p.buy_doll(float(sys.argv[3]))
-            p.save_money_status()
+            p.save_money_status("buy-doll")
     elif sys.argv[1] == "sell":
         if sys.argv[2] == "doll":
             p.sell_doll(float(sys.argv[3]))
-            p.save_money_status()
+            p.save_money_status("sell-doll")
     else:
         print("Wrong arg")
 else:
-    print("dummy")
+    print("no arg(initializing is done)")
