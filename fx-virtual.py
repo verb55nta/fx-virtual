@@ -55,7 +55,7 @@ class Fx:
     #------------------------------
     def init_doll_yen(self):
         self.__yen = 2000000
-        self.__ydollar = 0
+        self.__dollar = 0
     #------------------------------
     def print_now_yen(self):
         print(self.__yen)
