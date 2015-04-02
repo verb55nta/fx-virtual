@@ -9,7 +9,7 @@ import numpy as np
 
 #print(sys.argv[0])
 
-if(sys.argv[0] == "fx-virtual.py"):
+if(sys.argv[0] == "check.py"):
     working_path = "./"
 else:
     working_path = sys.argv[0].rsplit('/',1)[0] + '/'
@@ -57,6 +57,7 @@ dollar_file = open(working_path+'../dollar','r')
 line = dollar_file.readline()
 while line:
     my_dollar = float(line.split(',')[1])
+    #print(my_dollar)
     temp = line.split(',')[2]
     #print(len(temp))
     if temp.find('@')> -1 :
@@ -66,7 +67,8 @@ while line:
         #print("not str after @")
     line=dollar_file.readline()
 #print(my_dollar)
-if my_dollar != 0.0 :
+#print(my_dollar)
+if my_dollar > 0.0 :
     print("already buying dollar")
     sys.exit(1)
 
