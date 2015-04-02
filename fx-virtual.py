@@ -6,6 +6,11 @@ import os
 import os.path
 import math
 
+if(sys.argv[0] == "fx-virtual.py"):
+    working_path = "./"
+else:
+    working_path = sys.argv[0].rsplit('/',1)[0] + '/'
+
 class Fx:
     #------------------------------
     def __init__(self,yen,dollar):
@@ -14,13 +19,18 @@ class Fx:
         self.__yen = 0
         self.__dollar = 0.0
         
+        #print(sys.argv[0].rsplit('/',1)[0])
+        #print(sys.argv[0].rsplit('/',1)[1])
+
+        #print(working_path)
+        
         now = datetime.datetime.today()
-        yen_file = open('./yen','a+')
-        if os.path.getsize("./yen") == 0:
+        yen_file = open(working_path+"yen",'a+')
+        if os.path.getsize(working_path+"yen") == 0:
             yen_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen,"init"))
-        dollar_file = open('dollar','a+')
+        dollar_file = open(working_path+"dollar",'a+')
         line = dollar_file.readlines()
-        if os.path.getsize("./dollar") == 0:
+        if os.path.getsize(working_path+"dollar") == 0:
             dollar_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),dollar,"init"))
 
         yen_file.seek(0)
@@ -43,7 +53,7 @@ class Fx:
         dollar_file.close()
 
     def Read_rate(self):
-        rate_path_file=open("./rate_path_dollar","r")
+        rate_path_file=open(working_path+"rate_path_dollar","r")
         path=rate_path_file.read().rstrip("\n")
         #print(path)
         doll_bid_file=open(path+"doll-bid","r")
@@ -84,9 +94,9 @@ class Fx:
         else:
             buf = status
         now = datetime.datetime.today()
-        yen_file = open('./yen','a+')
+        yen_file = open(working_path+"yen",'a+')
         yen_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen,buf))
-        dollar_file = open('dollar','a+')
+        dollar_file = open(working_path+"dollar",'a+')
         dollar_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__dollar,buf))
         
 #initialize start

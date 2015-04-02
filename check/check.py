@@ -7,10 +7,15 @@ import os.path
 import math
 import numpy as np
 
-print(sys.argv[0])
+#print(sys.argv[0])
+
+if(sys.argv[0] == "fx-virtual.py"):
+    working_path = "./"
+else:
+    working_path = sys.argv[0].rsplit('/',1)[0] + '/'
 
 now = datetime.datetime.today()
-data_path_file = open("./data_path_dollar","r")
+data_path_file = open(working_path+"data_path_dollar","r")
 path=data_path_file.read().rstrip("\n")
 #print(path)
 #print(now.strftime("%Y%m%d"))
@@ -48,7 +53,7 @@ if len(doll_rate_bid) < 60 :
 
 
 
-dollar_file = open('../dollar','r')
+dollar_file = open(working_path+'../dollar','r')
 line = dollar_file.readline()
 while line:
     my_dollar = float(line.split(',')[1])
@@ -103,7 +108,7 @@ for i in range(0,now_minute+1):
 
 
 
-rate_path_file=open("../rate_path_dollar","r")
+rate_path_file=open(working_path+"../rate_path_dollar","r")
 path=rate_path_file.read().rstrip("\n")
 #print(path)
 doll_bid_file=open(path+"doll-bid","r")
