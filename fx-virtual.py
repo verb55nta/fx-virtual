@@ -10,7 +10,10 @@ if(sys.argv[0] == "fx-virtual.py"):
     working_path = "./"
 else:
     working_path = sys.argv[0].rsplit('/',1)[0] + '/'
-
+reason=0
+if len(sys.argv) > 5:
+    reason = int(sys.argv[5])
+#print(reason)
 class Fx:
     #------------------------------
     def __init__(self,yen,dollar):
@@ -27,11 +30,11 @@ class Fx:
         now = datetime.datetime.today()
         yen_file = open(working_path+"yen",'a+')
         if os.path.getsize(working_path+"yen") == 0:
-            yen_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen,"init"))
+            yen_file.write("{0},{1},{2},{3}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),yen,"init",reason))
         dollar_file = open(working_path+"dollar",'a+')
         line = dollar_file.readlines()
         if os.path.getsize(working_path+"dollar") == 0:
-            dollar_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),dollar,"init"))
+            dollar_file.write("{0},{1},{2},{3}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),dollar,"init",reason))
 
         yen_file.seek(0)
         line=yen_file.readline()
@@ -95,9 +98,9 @@ class Fx:
             buf = status
         now = datetime.datetime.today()
         yen_file = open(working_path+"yen",'a+')
-        yen_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen,buf))
+        yen_file.write("{0},{1},{2},{3}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__yen,buf,reason))
         dollar_file = open(working_path+"dollar",'a+')
-        dollar_file.write("{0},{1},{2}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__dollar,buf))
+        dollar_file.write("{0},{1},{2},{3}\n".format(now.strftime("%Y/%m/%d %H:%M:%S"),self.__dollar,buf,reason))
         
 #initialize start
 p=Fx(2000000,0.0)
