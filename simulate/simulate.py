@@ -119,7 +119,9 @@ for i in range(0,len(doll_rate_bid) - 10 + 1):
             print(temp)
             print("buy doll 1000 reason 0")
             print("doll-ask:{0}".format(doll_ask_now))
+            my_yen -= doll_ask_now * 1000
             my_dollar=1000.0
+            print("yen:{0}".format(my_yen))
             last_deal_rate_dollar = doll_ask_now
         if my_dollar == 0.0 :
             dummy=0
@@ -128,22 +130,30 @@ for i in range(0,len(doll_rate_bid) - 10 + 1):
             print(temp)
             print("sell doll 1000 reason 1") # loss cut
             print("doll-bid:{0}".format(doll_bid_now))
+            my_yen += doll_bid_now * 1000
             my_dollar = 0.0
+            print("yen:{0}".format(my_yen))
         elif doll_bid_now - last_deal_rate_dollar > 0.05:
             print(temp)
             print("sell doll 1000 reason 2") # gain cut
             print("doll-bid:{0}".format(doll_bid_now))
+            my_yen += doll_bid_now * 1000
             my_dollar = 0.0
+            print("yen:{0}".format(my_yen))
         elif last_deal_rate_dollar - doll_bid_now > 0.10 and doll_ask_10m_unit_a > doll_ask_10m_to_now_a:
             print(temp)
             print("sell doll 1000 reason 3") # low judge
             print("doll-bid:{0}".format(doll_bid_now))
+            my_yen += doll_bid_now * 1000
             my_dollar = 0.0
+            print("yen:{0}".format(my_yen))
         elif doll_bid_now - last_deal_rate_dollar > 0.10 and doll_ask_10m_to_now_a > doll_ask_10m_unit_a:
             print(temp)
             print("sell doll 1000 reason 4") # high judge
             print("doll-bid:{0}".format(doll_bid_now))
+            my_yen += doll_bid_now * 1000
             my_dollar = 0.0
+            print("yen:{0}".format(my_yen))
         #else :
             #print("dummy")
     #---------------------------------------------------------
