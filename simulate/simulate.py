@@ -55,14 +55,10 @@ doll_bid_10m_to_now_data=[]
 doll_ask_10m_to_now_data=[]
 
 time_size=int(sys.argv[4])
-#time_size=20
 init_yen = 2000000
 day_gain_lim = int(sys.argv[6])
-#day_gain_lim = 100
 day_loss_lim = int(sys.argv[7])
-#day_loss_lim = -50
 dollar_unit = float(sys.argv[5])
-#dollar_unit = 1000.0
 
 my_yen = 2000000
 if sys.argv[2] == "yes":
