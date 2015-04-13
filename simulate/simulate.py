@@ -15,9 +15,11 @@ import numpy as np
 #sys.argv[6]:day_gain_lim
 #sys.argv[7]:day_loss_lim
 
+"""
 if len(sys.argv) - 1 < 7:
     print("few arg")
     sys.exit(1)
+"""
 
 def print_debug(flag,buf):
     if flag == 1 :
@@ -49,22 +51,48 @@ doll_rate_file=open(sys.argv[1])
 line=doll_rate_file.readline()
 doll_rate_bid={}
 doll_rate_ask={}
-doll_bid_10m_unit_data=[]
-doll_ask_10m_unit_data=[]
-doll_bid_10m_to_now_data=[]
-doll_ask_10m_to_now_data=[]
+tmp_doll_bid_unit_data=[]
+tmp_doll_ask_unit_data=[]
+doll_bid_unit_data={}
+doll_ask_unit_data={}
+doll_bid_unit_a={}
+doll_ask_unit_a={}
+doll_bid_unit_b={}
+doll_ask_unit_b={}
+doll_bid_to_now_data={}
+doll_ask_to_now_data={}
 
-time_size=int(sys.argv[4])
+x=[]
+
+time_size=int(sys.argv[2])
 init_yen = 2000000
-day_gain_lim = int(sys.argv[6])
-day_loss_lim = int(sys.argv[7])
-dollar_unit = float(sys.argv[5])
+#day_gain_lim = int(sys.argv[6])
+#day_loss_lim = int(sys.argv[7])
+#dollar_unit = float(sys.argv[5])
+
+loss_cut=0
+gain_cut=0
+loss_cut_and_average_up=0
+gain_cut_and_average_sown=0
 
 my_yen = 2000000
+"""
 if sys.argv[2] == "yes":
     my_dollar=dollar_unit
 else:
     my_dollar=0.0
+"""
+
+"""
+ttttt={}
+temp=[]
+temp.append(1)
+temp.append(2)
+temp.append(3)
+print(temp)
+ttttt["123"]=temp
+print(ttttt)
+"""
 
 while line:
 
@@ -73,14 +101,27 @@ while line:
     doll_rate_ask[doll_rate_time]=float(line.split(':')[4])
     line=doll_rate_file.readline()
 
-for i in range(0,len(doll_rate_bid) - time_size + 1):
-    if int(i%10) == 0:
-        doll_bid_10m_unit_data=[]
-        doll_ask_10m_unit_data=[]
+
+for i in range(0,time_size):
+        x.append(i)
+
+for i in range(0,len(doll_rate_bid) - time_size + 1): # "i" is the index of current time
+    if int(i%time_size) == 0:
         for j in range(0,time_size):
+
             temp = str(int((i+j)/60))+"h"+str(int(((i+j)%60))).zfill(2)+"m"
-            doll_bid_10m_unit_data.append(doll_rate_bid[temp])
-            doll_ask_10m_unit_data.append(doll_rate_ask[temp])
+            tmp_doll_bid_unit_data.append(doll_rate_bid[temp])
+            tmp_doll_ask_unit_data.append(doll_rate_ask[temp])
+
+        temp2 = str(int((i+0)/60))+"h"+str(int(((i+0)%60))).zfill(2)+"m-"+str(int((i+time_size)/60))+"h"+str(int(((i+time_size)%60))).zfill(2)+"m"
+        doll_bid_unit_data[temp2]=tmp_doll_bid_unit_data
+        doll_ask_unit_data[temp2]=tmp_doll_ask_unit_data
+        tmp_doll_bid_unit_data=[]
+        tmp_doll_ask_unit_data=[]
+
+#print(doll_bid_unit_data)
+
+"""
     for j in range(0,time_size):
         if ((i+j)%60) >= 60:
             temp = str(int((i+j)/60)+1)+"h"+str(int(((i+j)%60))-60).zfill(2)+"m"
@@ -88,7 +129,10 @@ for i in range(0,len(doll_rate_bid) - time_size + 1):
             temp = str(int((i+j)/60))+"h"+str(int(((i+j)%60))).zfill(2)+"m"
         doll_bid_10m_to_now_data.append(doll_rate_bid[temp])
         doll_ask_10m_to_now_data.append(doll_rate_ask[temp])
-    
+"""
+
+"""
+for i in range(0,len(doll_rate_bid) - time_size + 1):
     #---------------------------------------------------------
     #simulate start
     #---------------------------------------------------------
@@ -111,28 +155,7 @@ for i in range(0,len(doll_rate_bid) - time_size + 1):
     A = A.T
     doll_ask_10m_to_now_a,doll_ask_10m_to_now_b = np.linalg.lstsq(A,doll_ask_10m_to_now_data)[0]
 
-    if sys.argv[3] == "buy":
-
-        if doll_ask_10m_unit_a < 0 and doll_ask_10m_to_now_a >0 :
-            sys.stdout.write("{0}:buy doll 10000 reason 0".format(temp))
-        else:
-            sys.stdout.write("{0}:dummy".format(temp))
-
-    elif sys.argv[3] == "sell":
-        
-        if last_deal_rate_dollar - doll_bid_now > 0.10:
-            sys.stdout.write("sell doll 10000 reason 1") # loss cut
-        elif doll_bid_now - last_deal_rate_dollar > 0.20:
-            sys.stdout.write("sell doll 10000 reason 2") # gain cut
-        elif last_deal_rate_dollar - doll_bid_now > 0.05 and doll_ask_hour_unit_a > doll_ask_hour_to_now_a:
-            sys.stdout.write("sell doll 10000 reason 3") # low judge
-        elif doll_bid_now - last_deal_rate_dollar > 0.10 and doll_ask_hour_to_now_a > doll_ask_hour_unit_a:
-            sys.stdout.write("sell doll 10000 reason 4") # high judge
-        else :
-            sys.stdout.write("dummy")
-        
-    elif sys.argv[3] == "both":
-
+    if sys.argv[3] == "both":
         if my_dollar > 0.0 :
             dummy=0
         elif my_yen - init_yen > day_gain_lim:
@@ -179,5 +202,4 @@ for i in range(0,len(doll_rate_bid) - time_size + 1):
 
     doll_bid_10m_to_now_data=[]
     doll_ask_10m_to_now_data=[]
-print(int(my_yen-init_yen))
-
+"""
