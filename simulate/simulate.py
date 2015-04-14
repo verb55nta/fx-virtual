@@ -26,9 +26,7 @@ def print_debug(flag,buf):
     if flag == 1 :
         print(buf)
 
-debug_flag=1
-
-
+debug_flag=0
 
 def zero_bury(y,x):
     last_non_zero_index=-1
@@ -268,15 +266,28 @@ def simulate_base(l_time_size,l_my_yen,l_my_dollar,l_day_gain_lim,l_day_loss_lim
             l_my_yen += doll_bid_now * dollar_unit
             l_my_dollar = 0.0
             print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(now_time,reason,doll_bid_now,l_my_yen))
+    return l_my_yen
 #---------------------------------------------------------
 #simulate base define end
 #---------------------------------------------------------
-            
 
+max_gain=0
+temp_gain=0
 #---------------------------------------------------------
 #simulate start
 #---------------------------------------------------------
-simulate_base(time_size,my_yen,my_dollar,day_gain_lim,day_loss_lim,loss_cut,gain_cut,loss_cut_and_average_up,gain_cut_and_average_down)
+for day_gain_lim in range(10,300,10):
+    for day_loss_lim in range(-10,-300,-10):
+        for loss_cut in range(1,50):
+            for gain_cut in range(1,50):
+                for loss_cut_and_average_up in range(1,50):
+                    for gain_cut_and_average_down in range(1,50):
+                        temp_gain=simulate_base(time_size,my_yen,my_dollar,day_gain_lim,day_loss_lim,loss_cut/100,gain_cut/100,loss_cut_and_average_up/100,gain_cut_and_average_down/100) - init_yen
+                        print("{0},{1},{2},{3},{4},{5}:{6}".format(day_gain_lim,day_loss_lim,loss_cut,gain_cut,loss_cut_and_average_up,gain_cut_and_average_down,temp_gain))
+                        if max_gain < temp_gain:
+                            max_gain = temp_gain
+                            print("max_update:{0},{1},{2},{3},{4},{5}:{6}".format(day_gain_lim,day_loss_lim,loss_cut,gain_cut,loss_cut_and_average_up,gain_cut_and_average_down,max_gain))
+
 #---------------------------------------------------------
 #simulate end
 #---------------------------------------------------------
