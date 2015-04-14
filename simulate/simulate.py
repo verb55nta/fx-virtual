@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import datetime
 import sys
 import os
@@ -20,12 +19,16 @@ if len(sys.argv) - 1 < 7:
     print("few arg")
     sys.exit(1)
 """
-
+#-------------------------------------------------------------------
+# define function
+#-------------------------------------------------------------------
 def print_debug(flag,buf):
     if flag == 1 :
         print(buf)
 
-debug_flag=0
+debug_flag=1
+
+
 
 def zero_bury(y,x):
     last_non_zero_index=-1
@@ -46,9 +49,18 @@ def zero_bury(y,x):
         last_non_zero_index=len(y)-1
     return x
 
-doll_rate_file=open(sys.argv[1])
+#-------------------------------------------------------------------
+# define function end
+#-------------------------------------------------------------------
 
-line=doll_rate_file.readline()
+#-------------------------------------------------------------------
+# define arrays and so on
+#-------------------------------------------------------------------
+
+
+
+
+
 doll_rate_bid={}
 doll_rate_ask={}
 tmp_doll_bid_unit_data=[]
@@ -59,41 +71,55 @@ doll_bid_unit_a={}
 doll_ask_unit_a={}
 doll_bid_unit_b={}
 doll_ask_unit_b={}
+tmp_doll_bid_to_now_data=[]
+tmp_doll_ask_to_now_data=[]
 doll_bid_to_now_data={}
 doll_ask_to_now_data={}
+doll_bid_to_now_a={}
+doll_ask_to_now_a={}
+doll_bid_to_now_b={}
+doll_ask_to_now_b={}
 
 x=[]
 
-time_size=int(sys.argv[2])
-init_yen = 2000000
-#day_gain_lim = int(sys.argv[6])
-#day_loss_lim = int(sys.argv[7])
-#dollar_unit = float(sys.argv[5])
 
-loss_cut=0
-gain_cut=0
-loss_cut_and_average_up=0
-gain_cut_and_average_sown=0
+#-------------------------------------------------------------------
+# define arrays and so on ends
+#-------------------------------------------------------------------
 
-my_yen = 2000000
-"""
-if sys.argv[2] == "yes":
-    my_dollar=dollar_unit
-else:
-    my_dollar=0.0
-"""
+#-------------------------------------------------------------------
+# init values
+#-------------------------------------------------------------------
 
-"""
-ttttt={}
-temp=[]
-temp.append(1)
-temp.append(2)
-temp.append(3)
-print(temp)
-ttttt["123"]=temp
-print(ttttt)
-"""
+doll_rate_file=open(sys.argv[1])
+time_size=int(sys.argv[2]) #magic number
 
+my_yen = 2000000 # magic number
+my_dollar = 0.0 # magic number
+day_gain_lim = 10000 #magic number
+day_loss_lim = -10000 #magic number
+
+loss_cut=0.30 #magic number
+gain_cut=0.10 #magic number
+loss_cut_and_average_up=0.20 #magic number
+gain_cut_and_average_down=0.05 #magic number
+
+init_yen = my_yen
+init_dollar = my_dollar
+
+dollar_unit = 1000
+
+zero_flag=0
+
+#-------------------------------------------------------------------
+# init values ends
+#-------------------------------------------------------------------
+
+#-------------------------------------------------------------------
+# read from file
+#-------------------------------------------------------------------
+
+line=doll_rate_file.readline()
 while line:
 
     doll_rate_time=line.split(':')[0].split('m')[0]+'m'
@@ -101,105 +127,156 @@ while line:
     doll_rate_ask[doll_rate_time]=float(line.split(':')[4])
     line=doll_rate_file.readline()
 
+#-------------------------------------------------------------------
+# read from file ends
+#-------------------------------------------------------------------
+
+#-------------------------------------------------------------------
+# value setup
+#-------------------------------------------------------------------
 
 for i in range(0,time_size):
-        x.append(i)
+    x.append(i)
 
-for i in range(0,len(doll_rate_bid) - time_size + 1): # "i" is the index of current time
+for i in range(0,len(doll_rate_bid) - time_size ): # "i" is the index of current time
     if int(i%time_size) == 0:
+
         for j in range(0,time_size):
 
             temp = str(int((i+j)/60))+"h"+str(int(((i+j)%60))).zfill(2)+"m"
+            if(doll_rate_bid[temp] == 0 or doll_rate_ask[temp] == 0):
+                zero_flag=1
+                print_debug(debug_flag,"unit-warning:zero detected in {0}".format(temp))
             tmp_doll_bid_unit_data.append(doll_rate_bid[temp])
             tmp_doll_ask_unit_data.append(doll_rate_ask[temp])
+        if zero_flag == 1:
+            tmp_doll_bid_unit_data = zero_bury(tmp_doll_bid_unit_data,tmp_doll_bid_unit_data)
+            tmp_doll_ask_unit_data = zero_bury(tmp_doll_ask_unit_data,tmp_doll_ask_unit_data)
+            zero_flag=0
 
-        temp2 = str(int((i+0)/60))+"h"+str(int(((i+0)%60))).zfill(2)+"m-"+str(int((i+time_size)/60))+"h"+str(int(((i+time_size)%60))).zfill(2)+"m"
+        temp2 = str(i//time_size*time_size // 60)+"h" + str(i//time_size*time_size % 60)+"m-"+str((i//time_size*time_size +time_size - 1)// 60)+"h" + str((i//time_size*time_size +time_size - 1)% 60)+"m"    
         doll_bid_unit_data[temp2]=tmp_doll_bid_unit_data
         doll_ask_unit_data[temp2]=tmp_doll_ask_unit_data
         tmp_doll_bid_unit_data=[]
         tmp_doll_ask_unit_data=[]
+        A = np.array([x,np.ones(len(x))])
+        A = A.T
+        tmp_doll_bid_unit_a,tmp_doll_bid_unit_b = np.linalg.lstsq(A,doll_bid_unit_data[temp2])[0]
+        doll_bid_unit_a[temp2]=tmp_doll_bid_unit_a
+        doll_bid_unit_b[temp2]=tmp_doll_bid_unit_b
+        tmp_doll_ask_unit_a,tmp_doll_ask_unit_b = np.linalg.lstsq(A,doll_ask_unit_data[temp2])[0]
+        doll_ask_unit_a[temp2]=tmp_doll_ask_unit_a
+        doll_ask_unit_b[temp2]=tmp_doll_ask_unit_b
 
-#print(doll_bid_unit_data)
 
-"""
     for j in range(0,time_size):
-        if ((i+j)%60) >= 60:
-            temp = str(int((i+j)/60)+1)+"h"+str(int(((i+j)%60))-60).zfill(2)+"m"
-        else:
-            temp = str(int((i+j)/60))+"h"+str(int(((i+j)%60))).zfill(2)+"m"
-        doll_bid_10m_to_now_data.append(doll_rate_bid[temp])
-        doll_ask_10m_to_now_data.append(doll_rate_ask[temp])
+
+        temp = str(int((i+j)/60))+"h"+str(int(((i+j)%60))).zfill(2)+"m"
+        if(doll_rate_bid[temp] == 0 or doll_rate_ask[temp] == 0):
+            zero_flag=1
+            print_debug(debug_flag,"to-now-warning:zero detected in {0}".format(temp))
+        tmp_doll_bid_to_now_data.append(doll_rate_bid[temp])
+        tmp_doll_ask_to_now_data.append(doll_rate_ask[temp])
+
+    if zero_flag == 1:
+        tmp_doll_bid_to_now_data = zero_bury(tmp_doll_bid_to_now_data,tmp_doll_bid_to_now_data)
+        tmp_doll_ask_to_now_data = zero_bury(tmp_doll_ask_to_now_data,tmp_doll_ask_to_now_data)
+        zero_flag=0        
+    temp2 = str(i // 60)+"h" + str(i % 60)+"m-"+str((i+time_size - 1)// 60)+"h" + str((i+time_size - 1)% 60)+"m"
+    doll_bid_to_now_data[temp2]=tmp_doll_bid_to_now_data
+    doll_ask_to_now_data[temp2]=tmp_doll_ask_to_now_data
+    tmp_doll_bid_to_now_data=[]
+    tmp_doll_ask_to_now_data=[]
+    A = np.array([x,np.ones(len(x))])
+    A = A.T
+    tmp_doll_bid_to_now_a,tmp_doll_bid_to_now_b = np.linalg.lstsq(A,doll_bid_to_now_data[temp2])[0]
+    doll_bid_to_now_a[temp2]=tmp_doll_bid_to_now_a
+    doll_bid_to_now_b[temp2]=tmp_doll_bid_to_now_b
+    tmp_doll_ask_to_now_a,tmp_doll_ask_to_now_b = np.linalg.lstsq(A,doll_ask_to_now_data[temp2])[0]
+    doll_ask_to_now_a[temp2]=tmp_doll_ask_to_now_a
+    doll_ask_to_now_b[temp2]=tmp_doll_ask_to_now_b
+
+#-------------------------------------------------------------------
+# value setup ends
+#-------------------------------------------------------------------
+
+#---------------------------------------------------------
+#simulate base define end
+#---------------------------------------------------------
+"""
+time_size=int(sys.argv[2]) #magic number
+
+my_yen = 2000000 # magic number
+my_dollar = 0.0 # magic number
+day_gain_lim = 10000 #magic number
+day_loss_lim = -10000 #magic number
+
+loss_cut=0.30 #magic number
+gain_cut=0.10 #magic number
+loss_cut_and_average_up=0.20 #magic number
+gain_cut_and_average_down=0.05 #magic number
 """
 
-"""
-for i in range(0,len(doll_rate_bid) - time_size + 1):
-    #---------------------------------------------------------
-    #simulate start
-    #---------------------------------------------------------
-    
-    doll_bid_10m_unit_data = zero_bury(doll_bid_10m_unit_data,doll_bid_10m_unit_data)
-    doll_ask_10m_unit_data = zero_bury(doll_ask_10m_unit_data,doll_ask_10m_unit_data)
-    doll_bid_10m_to_now_data = zero_bury(doll_bid_10m_to_now_data,doll_bid_10m_to_now_data)
-    doll_ask_10m_to_now_data = zero_bury(doll_ask_10m_to_now_data,doll_ask_10m_to_now_data)
-    
-    doll_bid_now = doll_bid_10m_to_now_data[len(doll_bid_10m_to_now_data) - 1]
-    doll_ask_now = doll_ask_10m_to_now_data[len(doll_ask_10m_to_now_data) - 1]
+def simulate_base(l_time_size,l_my_yen,l_my_dollar,l_day_gain_lim,l_day_loss_lim,l_loss_cut,l_gain_cut,l_loss_cut_and_average_up,l_gain_cut_and_average_down):
+    for i in range(0,len(doll_rate_bid) - l_time_size):
         
-    x=[]
-    for j in range(0,len(doll_ask_10m_to_now_data)):
-        x.append(j)
-    A = np.array([x,np.ones(len(x))])
-    A = A.T
-    doll_ask_10m_unit_a,doll_ask_10m_unit_b = np.linalg.lstsq(A,doll_ask_10m_unit_data)[0]
-    A = np.array([x,np.ones(len(x))])
-    A = A.T
-    doll_ask_10m_to_now_a,doll_ask_10m_to_now_b = np.linalg.lstsq(A,doll_ask_10m_to_now_data)[0]
-
-    if sys.argv[3] == "both":
-        if my_dollar > 0.0 :
+        now_time = str(int((i+l_time_size)/60))+"h"+str(int(((i+l_time_size)%60))).zfill(2)+"m"
+        now_time_unit = str(i // 60)+"h" + str(i % 60)+"m-"+str((i+l_time_size - 1)// 60)+"h" + str((i+l_time_size - 1)% 60)+"m"
+        unit_time = str(i//l_time_size*l_time_size // 60)+"h" + str(i//l_time_size*l_time_size % 60)+"m-"+str((i//l_time_size*l_time_size +l_time_size - 1)// 60)+"h" + str((i//l_time_size*l_time_size +l_time_size - 1)% 60)+"m"
+        doll_bid_now = doll_rate_bid[now_time]
+        doll_ask_now = doll_rate_ask[now_time]
+        
+        l_my_dollar,l_my_yen
+       
+        if l_my_dollar > 0.0 :
             dummy=0
-        elif my_yen - init_yen > day_gain_lim:
+        elif l_my_yen - init_yen > l_day_gain_lim:
             dummy=0
-        elif my_yen - init_yen < day_loss_lim:
+        elif l_my_yen - init_yen < l_day_loss_lim:
             dummy=0
-        elif doll_ask_10m_unit_a < 0 and doll_ask_10m_to_now_a >0 :
+        elif doll_ask_unit_a[unit_time] < 0 and doll_ask_to_now_a[now_time_unit] >0 :
             reason=0
-            my_yen -= doll_ask_now * dollar_unit
-            my_dollar=dollar_unit
+            l_my_yen -= doll_ask_now * dollar_unit
+            l_my_dollar=dollar_unit
             last_deal_rate_dollar = doll_ask_now
-            print_debug(debug_flag,"{0} buy doll 1000 reason {1} doll-ask:{2} yen:{3}".format(temp,reason,doll_ask_now,my_yen))
-
-        if my_dollar == 0.0 :
+            print_debug(debug_flag,"{0} buy doll 1000 reason {1} doll-ask:{2} yen:{3}".format(now_time,reason,doll_ask_now,l_my_yen))
+            
+        if l_my_dollar == 0.0 :
             dummy=0
-        elif last_deal_rate_dollar - doll_bid_now > 0.30:
+        elif last_deal_rate_dollar - doll_bid_now > l_loss_cut:
             reason=1
-            my_yen += doll_bid_now * dollar_unit
-            my_dollar = 0.0
-            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(temp,reason,doll_bid_now,my_yen))
-        elif doll_bid_now - last_deal_rate_dollar > 0.10:
+            l_my_yen += doll_bid_now * dollar_unit
+            l_my_dollar = 0.0
+            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(now_time,reason,doll_bid_now,l_my_yen))
+        elif doll_bid_now - last_deal_rate_dollar > l_gain_cut:
             reason=2
-            my_yen += doll_bid_now * dollar_unit
-            my_dollar = 0.0
-            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(temp,reason,doll_bid_now,my_yen))
-        elif last_deal_rate_dollar - doll_bid_now > 0.20 and doll_ask_10m_unit_a > doll_ask_10m_to_now_a:
+            l_my_yen += doll_bid_now * dollar_unit
+            l_my_dollar = 0.0
+            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(now_time,reason,doll_bid_now,l_my_yen))
+        elif last_deal_rate_dollar - doll_bid_now > l_loss_cut_and_average_up and doll_ask_unit_a[unit_time] > doll_ask_to_now_a[now_time_unit]:
             reason=3
-            my_yen += doll_bid_now * dollar_unit
-            my_dollar = 0.0
-            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(temp,reason,doll_bid_now,my_yen))
-        elif doll_bid_now - last_deal_rate_dollar > 0.05 and doll_ask_10m_to_now_a > doll_ask_10m_unit_a:
+            l_my_yen += doll_bid_now * dollar_unit
+            l_my_dollar = 0.0
+            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(now_time,reason,doll_bid_now,l_my_yen))
+        elif doll_bid_now - last_deal_rate_dollar > l_gain_cut_and_average_down and doll_ask_to_now_a[now_time_unit] > doll_ask_unit_a[unit_time]:
             reason=4
-            my_yen += doll_bid_now * dollar_unit
-            my_dollar = 0.0
-            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(temp,reason,doll_bid_now,my_yen))
-        elif my_dollar > 0.0 and i == len(doll_rate_bid) - time_size:
+            l_my_yen += doll_bid_now * dollar_unit
+            l_my_dollar = 0.0
+            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(now_time,reason,doll_bid_now,l_my_yen))
+        elif l_my_dollar > 0.0 and i == len(doll_rate_bid) - l_time_size - 1:
             reason=5
-            my_yen += doll_bid_now * dollar_unit
-            my_dollar = 0.0
-            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(temp,reason,doll_bid_now,my_yen))
-    #---------------------------------------------------------
-    #simulate end
-    #---------------------------------------------------------
+            l_my_yen += doll_bid_now * dollar_unit
+            l_my_dollar = 0.0
+            print_debug(debug_flag,"{0} sell doll 1000 reason {1} doll-bid:{2} yen:{3}".format(now_time,reason,doll_bid_now,l_my_yen))
+#---------------------------------------------------------
+#simulate base define end
+#---------------------------------------------------------
+            
 
-    doll_bid_10m_to_now_data=[]
-    doll_ask_10m_to_now_data=[]
-"""
+#---------------------------------------------------------
+#simulate start
+#---------------------------------------------------------
+simulate_base(time_size,my_yen,my_dollar,day_gain_lim,day_loss_lim,loss_cut,gain_cut,loss_cut_and_average_up,gain_cut_and_average_down)
+#---------------------------------------------------------
+#simulate end
+#---------------------------------------------------------
