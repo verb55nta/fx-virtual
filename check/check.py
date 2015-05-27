@@ -122,16 +122,19 @@ elif doll_ask_hour_unit_a < 0 and doll_ask_hour_to_now_a >0 :
 if my_dollar == 0.0 :
     print("can't sell dollar")
     sys.exit(1)
-if last_deal_rate_dollar - doll_bid_now > 0.20:
+if doll_bid_now == 0:
+    print("doll data error")
+    sys.exit(1)
+if last_deal_rate_dollar - doll_bid_now > 10.0:
     print("sell doll 1000 reason 1") # loss cut
     sys.exit(1)
-elif doll_bid_now - last_deal_rate_dollar > 0.05:
+elif doll_bid_now - last_deal_rate_dollar > 0.10:
     print("sell doll 1000 reason 2") # gain cut
     sys.exit(1)
-elif last_deal_rate_dollar - doll_bid_now > 0.10 and doll_ask_hour_unit_a > doll_ask_hour_to_now_a:
+elif last_deal_rate_dollar - doll_bid_now > 7.0 and doll_ask_hour_unit_a > doll_ask_hour_to_now_a:
     print("sell doll 1000 reason 3") # low judge
     sys.exit(1)
-elif doll_bid_now - last_deal_rate_dollar > 0.10 and doll_ask_hour_to_now_a > doll_ask_hour_unit_a:
+elif doll_bid_now - last_deal_rate_dollar > 0.05 and doll_ask_hour_to_now_a > doll_ask_hour_unit_a:
     print("sell doll 1000 reason 4") # high judge
     sys.exit(1)
 else :
